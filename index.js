@@ -32,3 +32,10 @@ app.use(session({
 app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}.`);
 })
+
+app.get('/', (req, res) => {
+    res.status(200).send({
+        title: "IWP project Backend",
+        author: "Abhinav Gorantla"
+    });
+});
