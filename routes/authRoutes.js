@@ -7,7 +7,7 @@ const User = require('../models/User');
 const { auth } = require('../middleware/auth');
 
 
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
     const { email, name, password } =  req.body;
     const newUser = new User({
         email, name, password
@@ -28,9 +28,13 @@ router.post('/signup', (req, res) => {
     }
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     try {
-        const userFound = await User.findOne({email});
+        const password = req.body.password;
+
+        const foundUser = await User.findOne({email: req.body.email});
+
+        console.log(foundUser);
 
         if(!foundUser){
             console.log("Unable to login!");
@@ -43,7 +47,7 @@ router.post('/login', (req, res) => {
             console.log("Unable to login!");
             res.status(400).send({message: "Unable to login!"});
         }
-        const token = jwt.sign({_id: foundUser._id, email: foundUser.email});
+        const token = jwt.sign({_id: foundUser._id, email: foundUser.email}, process.env.SESSION_SECRET);
         
         res.send({foundUser, token});
 
@@ -51,4 +55,6 @@ router.post('/login', (req, res) => {
         console.log(error);
         res.status(500).send(error);
     }
-})
+});
+
+module.exports = router;

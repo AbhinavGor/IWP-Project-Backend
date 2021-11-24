@@ -6,8 +6,12 @@ const path = require("path");
 const session = require("express-session");
 const mongoose = require("mongoose");
 
+const authRoutes = require('./routes/authRoutes');
+const productRoutes = require('./routes/productRoutes');
+const supportRoutes = require('./routes/supportRoutes');
+
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 9000;
 
 
 mongoose.connect(process.env.MONGO_URI, {
@@ -29,6 +33,9 @@ app.use(session({
     cookie: { maxAge: 60000 }
 }));
 
+app.use('/products', productRoutes);
+app.use('/auth', authRoutes);
+app.use('/support', supportRoutes);
 app.listen(PORT, () => {
     console.log(`Server running on port: ${PORT}.`);
 })
