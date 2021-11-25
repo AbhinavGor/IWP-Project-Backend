@@ -57,4 +57,20 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.post('/resetpassword', auth, async (req,res) => {
+    const { password } = req.body;
+    const UID = req.user._id;
+
+    const foundUser = await User.findOne({_id: UID});
+
+    if(foundUser){
+        foundUser.password = password;
+        await foundUser.save();
+
+        res.status(200).send({"message": "password changed successfully!"});
+    }else{
+        res.status(404).send({"message": "User not found."});
+    }
+});
+
 module.exports = router;
