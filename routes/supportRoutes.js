@@ -1,6 +1,7 @@
 const express = require('express');
 const SupportRequest = require('../models/SupportRequest');
 const router = express.Router();
+const mongoose = require('mongoose');
 
 router.post('/', async (req, res) => {
     try {
@@ -18,6 +19,21 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.post('/:id', async (req, res) => {
+    try {
+        const foundReq = await SupportRequest.findOne({_id: mongoose.Types.ObjectId(req.params.id)});
+        foundReq.solution = req.body.answer;
+
+        await foundReq.save();
+
+        console.log(foundReq);
+
+        res.status(200).send({foundReq});
+    } catch (error) {
+        res.status(500).send({error})
+    }
+});
+
 router.get('/', async (req, res) => {
     try {
         const foundRequests = await SupportRequest.find();
@@ -26,6 +42,6 @@ router.get('/', async (req, res) => {
     } catch (error) {
         res.status(500).send(error);
     }
-})
+});
 
 module.exports = router;
