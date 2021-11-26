@@ -49,8 +49,8 @@ router.get("/:id/picture", async (req,res) => {
             throw new Error("Article or Picture doesn't exist")
         }
 
-        res.set("Content-Type","image/png")
-        res.send(product.image)
+        const img = 'data:image/png;base64,' + btoa(product.image);
+        res.send(img)
     } catch (e) {
         console.log(e)
         res.status(404).send({"message":`Oops! No picture found for article with id.`})
