@@ -1,4 +1,5 @@
 const express = require('express')
+const mongoose = require('mongoose')
 const router = express.Router()
 const {auth} = require('../middleware/auth')
 const Product = require('../models/Product')
@@ -42,7 +43,7 @@ router.get('/', async (req, res) => {
 router.get("/:id/picture", async (req,res) => {
     try{
 
-        const product = await Product.findById(req.params.id)
+        const product = await Product.findOne({_id: mongoose.Types.ObjectId(req.params.id)})
 
         if(!product || !product.image) {
             throw new Error("Article or Picture doesn't exist")
@@ -52,7 +53,7 @@ router.get("/:id/picture", async (req,res) => {
         res.send(product.image)
     } catch (e) {
         console.log(e)
-        res.status(404).send({"message":`Oops! No picture found for article with id ${article.id}.`})
+        res.status(404).send({"message":`Oops! No picture found for article with id.`})
     }
 })
 
