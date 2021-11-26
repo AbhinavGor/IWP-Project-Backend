@@ -88,23 +88,4 @@ router.get('/:email', async (req, res) => {
     }
 })
 
-router.get('/profile', auth, async (req, res) => {
-    try {
-        const token = req.header("Authorization").replace("Bearer ", "");
-
-        const decoded = jwt.verify(token, process.env.SESSION_SECRET);
-        console.log(decoded);
-        
-        const user = await User.findOne({ _id: decoded._id });
-
-        if(user){
-            res.status(200).send(user);
-        }else{
-            res.status(404).send({'message': 'No user found!'});
-        }
-    } catch (error) {
-        res.status(500).send(error);
-    }
-})
-
 module.exports = router;

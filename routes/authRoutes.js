@@ -39,17 +39,18 @@ router.post('/login', async (req, res) => {
         if(!foundUser){
             console.log("Unable to login!");
             res.status(400).send({message: "Unable to login!"});
-        }
+        }else{
+            const isMatch = await bcrypt.compare(password, foundUser.password);
 
-        const isMatch = await bcrypt.compare(password, foundUser.password);
-
-        if(!isMatch){
-            console.log("Unable to login!");
-            res.status(400).send({message: "Unable to login!"});
+            if(!isMatch){
+                console.log("Unable to login!");
+                res.status(400).send({message: "Unable to login!"});
+            }else{
+                const token = jwt.sign({_id: foundUser._id, email: foundUser.email}, process.env.SESSION_SECRET);
+            
+                res.send({foundUser, token});
+            }
         }
-        const token = jwt.sign({_id: foundUser._id, email: foundUser.email}, process.env.SESSION_SECRET);
-        
-        res.send({foundUser, token});
 
     } catch (error) {
         console.log(error);
