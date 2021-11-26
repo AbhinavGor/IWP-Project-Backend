@@ -88,7 +88,7 @@ router.get('/:email', async (req, res) => {
     }
 })
 
-router.get('/profile', async (req, res) => {
+router.get('/profile', auth, async (req, res) => {
     try {
         const token = req.header("Authorization").replace("Bearer ", "");
 
