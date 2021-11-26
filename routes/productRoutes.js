@@ -4,6 +4,7 @@ const router = express.Router()
 const {auth} = require('../middleware/auth')
 const Product = require('../models/Product')
 const User = require('../models/User')
+const bcrypt = require('bcryptjs')
 
 router.post('/newproduct', auth, async (req, res) => {
     try {
@@ -49,7 +50,7 @@ router.get("/:id/picture", async (req,res) => {
             throw new Error("Article or Picture doesn't exist")
         }
 
-        const img = 'data:image/png;base64,' + btoa(product.image);
+        const img = 'data:image/png;base64,' + product.image.toString('base64');
         res.send(img)
     } catch (e) {
         console.log(e)
@@ -67,6 +68,38 @@ router.get('/myproducts', auth, async (req, res) => {
             res.status(200).send(foundProducts);
         }else{
             res.status(404).send({'message': 'No products found!'});
+        }
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+router.get('/:email', async (req, res) => {
+    try {
+        const foundUser = await User.findOne({email: req.params.email});
+
+        if(foundUser){
+            res.status(200).send(foundUser);
+        }else{
+            res.status(404).send({'message': 'No user found!'});
+        }
+    } catch (error) {
+        res.status(500).send(error);
+    }
+})
+
+router.get('/profile', async (req, res) => {
+    try {
+        const token = req.header("Authorization").replace("Bearer ", "");
+
+        const decoded = jwt.verify(token, process.env.SESSION_SECRET);
+        
+        const user = await User.findOne({ _id: decoded._id });
+
+        if(user){
+            res.status(200).send(user);
+        }else{
+            res.status(404).send({'message': 'No user found!'});
         }
     } catch (error) {
         res.status(500).send(error);
