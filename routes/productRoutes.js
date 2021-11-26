@@ -39,6 +39,23 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get("/:id/picture", async (req,res) => {
+    try{
+
+        const product = await Product.findById(req.params.id)
+
+        if(!product || !product.image) {
+            throw new Error("Article or Picture doesn't exist")
+        }
+
+        res.set("Content-Type","image/png")
+        res.send(product.image)
+    } catch (e) {
+        console.log(e)
+        res.status(404).send({"message":`Oops! No picture found for article with id ${article.id}.`})
+    }
+})
+
 router.get('/myproducts', auth, async (req, res) => {
     try {
         const foundUser = await User.findOne({_id: req.user._id});
