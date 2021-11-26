@@ -27,16 +27,11 @@ const userSchema = mongoose.Schema({
     trim:true,
     minlength: 7,
   },
-  tokens: [{
-    token: {
-        type: String,
-        required: true
-    }
-}],
 
-  avatar: {
-      type: Buffer
-  },
+  address: {type: String},
+  mobile: {type: String},
+  altMobile: {type: String},
+  upi: {type: String},
 
   isAdmin:{
       type: Boolean,

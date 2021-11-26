@@ -7,7 +7,7 @@ const User = require('../models/User');
 const { auth } = require('../middleware/auth');
 
 
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
     const { email, name, password } =  req.body;
     const newUser = new User({
         email, name, password
@@ -28,27 +28,50 @@ router.post('/signup', (req, res) => {
     }
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     try {
-        const userFound = await User.findOne({email});
+        const password = req.body.password;
+
+        const foundUser = await User.findOne({email: req.body.email});
+
+        console.log(foundUser);
 
         if(!foundUser){
             console.log("Unable to login!");
             res.status(400).send({message: "Unable to login!"});
-        }
+        }else{
+            const isMatch = await bcrypt.compare(password, foundUser.password);
 
-        const isMatch = await bcrypt.compare(password, foundUser.password);
-
-        if(!isMatch){
-            console.log("Unable to login!");
-            res.status(400).send({message: "Unable to login!"});
+            if(!isMatch){
+                console.log("Unable to login!");
+                res.status(400).send({message: "Unable to login!"});
+            }else{
+                const token = jwt.sign({_id: foundUser._id, email: foundUser.email}, process.env.SESSION_SECRET);
+            
+                res.send({foundUser, token});
+            }
         }
-        const token = jwt.sign({_id: foundUser._id, email: foundUser.email});
-        
-        res.send({foundUser, token});
 
     } catch (error) {
         console.log(error);
         res.status(500).send(error);
     }
-})
+});
+
+router.post('/resetpassword', auth, async (req,res) => {
+    const { password } = req.body;
+    const UID = req.user._id;
+
+    const foundUser = await User.findOne({_id: UID});
+
+    if(foundUser){
+        foundUser.password = password;
+        await foundUser.save();
+
+        res.status(200).send({"message": "password changed successfully!"});
+    }else{
+        res.status(404).send({"message": "User not found."});
+    }
+});
+
+module.exports = router;
